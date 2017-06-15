@@ -12,7 +12,8 @@
 
 - name: Ensure that the abbr user is present
   user:
-    name: abbr
+    name: '{{ abbr_user }}'
+    home: '{{ abbr_home }}'
     group: http
     state: present
     shell: /bin/zsh
@@ -22,7 +23,7 @@
 
 - name: Make the abbr home group-accessible
   file:
-    path: ~abbr
+    path: '{{ abbr_home }}'
     mode: 0770
   tags:
     - abbr
@@ -30,7 +31,7 @@
 - name: Clone abbr source
   git:
     repo: https://github.com/rixx/abbr.git
-    dest: ~abbr/src
+    dest: '{{ abbr_source_dir }}'
     update: yes
   become_user: abbr
   notify:
@@ -40,7 +41,7 @@
 
 - name: Create socket directory and ensure correct access rights
   file:
-    path: /var/run/nginx/
+    path: '{{ abbr_gunicorn_sock_dir }}'
     state: directory
     mode: 2775
     owner: http
@@ -49,9 +50,9 @@
 
 - name: Install dependencies inside abbr virtualenv
   pip:
-    requirements: ~abbr/src/requirements.txt
+    requirements: '{{ abbr_source_dir }}/requirements.txt'
     state: latest
-    virtualenv: ~abbr/.virtualenvs/abbr
+    virtualenv: '{{ abbr_home }}/.virtualenvs/abbr'
   become_user: abbr
   tags:
     - abbr
@@ -61,7 +62,7 @@
   pip:
     name: "{{ item }}"
     state: latest
-    virtualenv: ~abbr/.virtualenvs/abbr
+    virtualenv: '{{ abbr_home }}/.virtualenvs/abbr'
   become_user: abbr
   with_items:
     - gunicorn
@@ -73,14 +74,14 @@
 - name: Configure abbr
   template:
     src: abbr_conf.j2
-    dest: ~abbr/abbr.conf
+    dest: '{{ abbr_home }}/abbr.conf'
     owner: abbr
   tags:
     - abbr
 
 - name: Create directory for gunicorn
   file:
-    path: ~abbr/bin
+    path: '{{ abbr_home }}/bin'
     state: directory
     mode: 0755
     owner: abbr
@@ -90,7 +91,7 @@
 - name: Configure gunicorn
   template:
     src: gunicorn_abbr
-    dest: ~abbr/bin/gunicorn_abbr
+    dest: '{{ abbr_home }}/bin/gunicorn_abbr'
     owner: abbr
     mode: u+rwx
   notify:
