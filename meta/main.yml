@@ -1,0 +1,10 @@
+---
+galaxy_info:
+  author: "rixx"
+  license: BSD
+  min_ansible_version: 1.4
+  platforms:
+   - name: Arch
+  categories:
+   - web
+dependencies: []
