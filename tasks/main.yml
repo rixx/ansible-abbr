@@ -73,7 +73,7 @@
 
 - name: Configure abbr
   template:
-    src: abbr_conf.j2
+    src: abbr.conf.j2
     dest: '{{ abbr_home }}/abbr.conf'
     owner: abbr
   tags:
