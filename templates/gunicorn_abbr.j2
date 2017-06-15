@@ -1,10 +1,10 @@
 #!/bin/bash
 
 NAME="abbr"
-HOME=/home/abbr
-SOCKFILE=/var/run/nginx/gunicorn_abbr.sock
+HOME={{ abbr_home }}
+SOCKFILE={{ abbr_gunicorn_sock_path }}
 PIDFILE=$HOME/gunicorn.pid
-NUM_WORKERS=3                 # how many worker processes should Gunicorn spawn
+NUM_WORKERS={{ abbr_gunicorn_workers }}                 # how many worker processes should Gunicorn spawn
 export ABBR_CONFIG=$HOME/abbr.conf
 
 source $HOME/.virtualenvs/abbr/bin/activate

@@ -1,5 +1,5 @@
 upstream abbr_server {
-    server unix:/var/run/nginx/gunicorn_abbr.sock fail_timeout=0;
+    server unix:{{ abbr_gunicorn_sock_path }} fail_timeout=0;
 }
 
 server {
@@ -13,15 +13,15 @@ server {
     }
 
 	location /static/ {
-		alias /home/abbr/src/abbr/static/;
+		alias {{ abbr_source_dir }}/abbr/static/;
 	}
 
-    access_log  /var/log/nginx/abbr.access.log;
-    error_log   /var/log/nginx/abbr.error.log;
+    access_log  {{ abbr_log_dir }}/abbr.access.log;
+    error_log   {{ abbr_log_dir }}/abbr.error.log;
 
     client_max_body_size 32M;
 
     ssl on;
-    ssl_certificate /etc/ssl/letsencrypt/certs/{{ abbr_domain }}/fullchain.pem;
-    ssl_certificate_key /etc/ssl/letsencrypt/certs/{{ abbr_domain }}/privkey.pem;
+    ssl_certificate {{ abbr_cert_path }}{{ abbr_cert_name }}
+    ssl_certificate_key {{ abbr_cert_path }}{{ abbr_key_name }}
 }

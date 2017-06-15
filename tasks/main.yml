@@ -88,7 +88,7 @@
     - abbr
 
 - name: Configure gunicorn
-  copy:
+  template:
     src: gunicorn_abbr
     dest: ~abbr/bin/gunicorn_abbr
     owner: abbr
@@ -99,7 +99,7 @@
     - abbr
 
 - name: Create abbr service
-  copy:
+  template:
     src: abbr_service
     dest: /etc/systemd/system/abbr.service
   notify:
