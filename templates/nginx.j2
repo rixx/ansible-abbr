@@ -22,6 +22,6 @@ server {
     client_max_body_size 32M;
 
     ssl on;
-    ssl_certificate {{ abbr_cert_path }}{{ abbr_cert_name }}
-    ssl_certificate_key {{ abbr_cert_path }}{{ abbr_key_name }}
+    ssl_certificate {{ abbr_cert_path }}{{ abbr_cert_name }};
+    ssl_certificate_key {{ abbr_cert_path }}{{ abbr_key_name }};
 }
