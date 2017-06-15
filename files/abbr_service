@@ -1,0 +1,11 @@
+[Unit]
+Description=abbr server
+After=network.target
+
+[Service]
+Type=simple
+User=abbr
+ExecStart=/home/abbr/bin/gunicorn_abbr
+
+[Install]
+WantedBy=multi-user.target

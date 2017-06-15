@@ -1,0 +1,20 @@
+#!/bin/bash
+
+NAME="abbr"
+HOME=/home/abbr
+SOCKFILE=/var/run/nginx/gunicorn_abbr.sock
+PIDFILE=$HOME/gunicorn.pid
+NUM_WORKERS=3                 # how many worker processes should Gunicorn spawn
+export ABBR_CONFIG=$HOME/abbr.conf
+
+source $HOME/.virtualenvs/abbr/bin/activate
+
+cd $HOME/src/abbr
+
+exec gunicorn app:app \
+  --name $NAME \
+  --workers $NUM_WORKERS \
+  --log-level=info \
+  --bind=unix:$SOCKFILE \
+  --pid $PIDFILE \
+  -k gevent

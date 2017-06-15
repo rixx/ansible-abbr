@@ -1,0 +1,27 @@
+upstream abbr_server {
+    server unix:/var/run/nginx/gunicorn_abbr.sock fail_timeout=0;
+}
+
+server {
+	listen 443 ssl;
+    listen [::]:443 ssl;
+    server_name {{ abbr_domain }};
+
+    location / {
+        proxy_set_header Host $http_host;
+        proxy_pass http://abbr_server;
+    }
+
+	location /static/ {
+		alias /home/abbr/src/abbr/static/;
+	}
+
+    access_log  /var/log/nginx/abbr.access.log;
+    error_log   /var/log/nginx/abbr.error.log;
+
+    client_max_body_size 32M;
+
+    ssl on;
+    ssl_certificate /etc/ssl/letsencrypt/certs/{{ abbr_domain }}/fullchain.pem;
+    ssl_certificate_key /etc/ssl/letsencrypt/certs/{{ abbr_domain }}/privkey.pem;
+}

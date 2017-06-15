@@ -1,0 +1,125 @@
+---
+- name: Ensure that all required packages are installed
+  pacman: pkg={{item}} state=present
+  with_items:
+    - git
+    - python
+    - python-pip
+    - python-virtualenv
+  tags:
+    - abbr
+    - packages
+
+- name: Ensure that the abbr user is present
+  user:
+    name: abbr
+    group: http
+    state: present
+    shell: /bin/zsh
+  tags:
+    - abbr
+    - users
+
+- name: Make the abbr home group-accessible
+  file:
+    path: ~abbr
+    mode: 0770
+  tags:
+    - abbr
+
+- name: Clone abbr source
+  git:
+    repo: https://github.com/rixx/abbr.git
+    dest: ~abbr/src
+    update: yes
+  become_user: abbr
+  notify:
+    - Restart abbr
+  tags:
+    - abbr
+
+- name: Create socket directory and ensure correct access rights
+  file:
+    path: /var/run/nginx/
+    state: directory
+    mode: 2775
+    owner: http
+  tags:
+    - abbr
+
+- name: Install dependencies inside abbr virtualenv
+  pip:
+    requirements: ~abbr/src/requirements.txt
+    state: latest
+    virtualenv: ~abbr/.virtualenvs/abbr
+  become_user: abbr
+  tags:
+    - abbr
+    - packages
+
+- name: Install additional dependencies for abbr
+  pip:
+    name: "{{ item }}"
+    state: latest
+    virtualenv: ~abbr/.virtualenvs/abbr
+  become_user: abbr
+  with_items:
+    - gunicorn
+    - gevent
+  tags:
+    - abbr
+    - packages
+
+- name: Configure abbr
+  template:
+    src: abbr_conf.j2
+    dest: ~abbr/abbr.conf
+    owner: abbr
+  tags:
+    - abbr
+
+- name: Create directory for gunicorn
+  file:
+    path: ~abbr/bin
+    state: directory
+    mode: 0755
+    owner: abbr
+  tags:
+    - abbr
+
+- name: Configure gunicorn
+  copy:
+    src: gunicorn_abbr
+    dest: ~abbr/bin/gunicorn_abbr
+    owner: abbr
+    mode: u+rwx
+  notify:
+    - Restart abbr
+  tags:
+    - abbr
+
+- name: Create abbr service
+  copy:
+    src: abbr_service
+    dest: /etc/systemd/system/abbr.service
+  notify:
+    - Restart abbr
+  tags:
+    - abbr
+
+- name: Start and enable abbr service
+  service:
+    name: abbr
+    enabled: yes
+    state: started
+  tags:
+    - abbr
+
+- name: Configure nginx
+  template:
+    src: nginx_abbr.j2
+    dest: /etc/nginx/sites/abbr.conf
+  notify:
+    - Reload nginx
+  tags:
+    - abbr
