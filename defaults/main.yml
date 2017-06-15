@@ -1,0 +1,12 @@
+---
+abbr_domain: 'localhost'
+abbr_name_length: 5
+abbr_gunicorn_sock_path: 'unix:/var/run/nginx/gunicorn_abbr.sock'
+
+abbr_home: '/home/abbr'
+abbr_source_dir: '{{ abbr_home }}/src'
+abbr_log_dir: '/var/log/nginx'
+
+abbr_cert_path: '/etc/ssl/letsencrypt/certs/{{ abbr_domain }}/'
+abbr_cert_name: 'fullchain.pem'
+abbr_key_name: 'privkey.pem'
