@@ -1,6 +1,6 @@
 ---
 abbr_domain: 'localhost'
-abbr_name_length: 5
+abbr_name_length: 5  # default length of shortened links
 abbr_gunicorn_sock_dir: '/var/run/nginx'
 abbr_gunicorn_sock_path: '{{ abbr_gunicorn_sock_dir }}/gunicorn_abbr.sock'
 abbr_gunicorn_workers: 3
